@@ -11,7 +11,7 @@ exports.signUp = (req, res, next) =>
             const user = new User({email: req.body.email, password: hash});
             console.log(user)
             user.save()
-                .then(() => res.status(201)).json({ message: 'Utilisateur créé !' })
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
                 .catch(error => res.status(400).json({ error: 'erreur lors de la sauvegarde' }));
             })
             .catch(error => res.status(500).json({ error: 'erreur en sortie' }));
