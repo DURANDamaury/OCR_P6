@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const http = require('http');       //module http
 const app = require('./app');       //module interne app
 

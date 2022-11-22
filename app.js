@@ -1,8 +1,9 @@
 const express = require('express');         //import express modul
 const mongoose = require('mongoose');
 
-
-mongoose.connect('mongodb+srv://bdciron:6cpc128@cluster0.llzcdt2.mongodb.net/test?retryWrites=true&w=majority',{ useNewUrlParser: true, useUnifiedTopology: true })
+const mongodb_user = process.env.MONGODB_USER
+const mongodb_pass = process.env.MONGODB_PASS
+mongoose.connect('mongodb+srv://'+mongodb_user+':'+mongodb_pass+'@cluster0.llzcdt2.mongodb.net/test?retryWrites=true&w=majority',{ useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
