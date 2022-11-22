@@ -14,13 +14,9 @@ const userSchema = mongoose.Schema(
                 },
     password:   {
                 type: String, required: true,
-                /* validate (password)
-                    {
-                        if (!validator.isLength(password, {min: 7, max:16})) throw new error ('Le mot de pass doit contenir 7 caractères')
-                    } */
                 }
     });
 
-userSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator, { message: '{PATH} doit être unique' });
 
 module.exports = mongoose.model('User', userSchema);

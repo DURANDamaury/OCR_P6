@@ -1,18 +1,18 @@
 const User = require('../models/modelsUsers');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
 
 exports.signUp = (req, res, next) => 
     {
-        //delete req.body._id
         bcrypt.hash(req.body.password, 10)
             .then(hash => 
             {
             const user = new User({email: req.body.email, password: hash});
-            console.log(user)
             user.save()
                 .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-                .catch(error => res.status(400).json({ error: 'erreur lors de la sauvegarde' }));
+                .catch(error => res.status(400).json({ error: error.message })) //
+            next()
             })
             .catch(error => res.status(500).json({ error: 'erreur en sortie' }));
 
@@ -21,24 +21,38 @@ exports.signUp = (req, res, next) =>
 exports.login = (req, res, next) => 
     {
         User.findOne({ email: req.body.email })
-        .then(user => {
-            if (!user) 
+        .then(user => 
+            {
+            if (user === null)  //l'utilisateur n'existe pas
                 {
-                return res.status(401).json({ message: 'Paire login/mot de passe incorrecte'});
+                return res.status(401).json({ message: 'Paire login/mot de passe incorrecte'}); // on ne dira pas que l'utilisateur n'existe pas pour ne pas donner cette info
                 }
-            bcrypt.compare(req.body.password, user.password)
-                .then(valid => {
-                    if (!valid) 
+            else                //l'utilisateur existe
+                {
+                bcrypt.compare(req.body.password, user.password)    //on compare le password passé par le formulaire avec celui de la bdd
+                    .then(valid =>
                         {
-                        return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
-                        }
-                    res.status(200).json
-                        ({
-                        userId: user._id,
-                        token: 'TOKEN'
-                        });
-                })
-                .catch(error => res.status(500).json({ error }));
-        })
-        .catch(error => res.status(500).json({ error }));
+                        if (!valid) //le mdp n'est pas bon
+                            {
+                            return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
+                            }
+                        else        //le mdp est bon
+                            {
+                            res.status(200).json
+                                ({
+                                    userId: user._id,       //userId récupéré de la bdd
+                                    token: jwt.sign
+                                        (                                                            //génération du token crypté
+                                        { userId: user._id },                                                   //Chaine à encoder
+                                        'Bk+CI8w!PIDK5!AwAT7957T1oziRRuUyQ@^pU&B@t%znDDp5BUaWLGw^AV=6',         //Chaine d'encodage
+                                        { expiresIn: '24h' }
+                                        )                                                    //Validité
+                                });
+                            }
+                        })
+                    .catch(error => res.status(500).json({ error })); //erreur de traitement (pas une erreur de mdp)
+                }
+            }
+            )
+        .catch(error => res.status(500).json({ error })); //Erreur dans le cas d'un problème avec la bdd
     };

@@ -17,9 +17,11 @@ app.use((req, res, next) =>
     next();
     });
 
-const userRoutes = require('./routes/routesUsers');    
+const userRoutes = require('./routes/routesUsers');
+const sauceRoutes = require('./routes/routesSauces');    
 
 app.use('/api/auth', userRoutes);
+app.use('/api', sauceRoutes);
 
 
 module.exports = app;                       //export de notre app pour récupération serveur
