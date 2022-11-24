@@ -1,5 +1,6 @@
 const express = require('express');         //import express modul
-const mongoose = require('mongoose');
+const mongoose = require('mongoose');       //Mongoose pour gérer la bdd
+const path = require('path');               //Permet d'accéder au path de notre serveur
 
 const mongodb_user = process.env.MONGODB_USER
 const mongodb_pass = process.env.MONGODB_PASS
@@ -22,6 +23,9 @@ const userRoutes = require('./routes/routesUsers');
 const sauceRoutes = require('./routes/routesSauces');    
 
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images'))); //indique à Express qu'il faut gérer la ressource images de manière statique
+                                                                    //(un sous-répertoire de notre répertoire de base, __dirname)
+                                                                    //à chaque fois qu'elle reçoit une requête vers la route /images
 app.use('/api', sauceRoutes);
 
 
