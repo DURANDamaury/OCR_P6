@@ -43,7 +43,7 @@ exports.login = (req, res, next) =>
                                     token: jwt.sign
                                         (                                                            //génération du token crypté
                                         { userId: user._id },                                                   //Chaine à encoder
-                                        'Bk+CI8w!PIDK5!AwAT7957T1oziRRuUyQ@^pU&B@t%znDDp5BUaWLGw^AV=6',         //Chaine d'encodage
+                                        process.env.TOKEN,         //Chaine d'encodage
                                         { expiresIn: '24h' }
                                         )                                                    //Validité
                                 });
