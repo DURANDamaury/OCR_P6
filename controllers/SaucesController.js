@@ -1,21 +1,22 @@
 const Sauce = require('../models/modelsSauce');
+const Fonctions = require('../utils/sauceFonction')
 
 
-exports.sauces = (req, res) => 
+exports.getAllSauces = (req, res) => 
     {
         Sauce.find()
             .then(sauces => res.status(200).json(sauces))
             .catch(error => res.status(400).json({ error }))
     };
 
-exports.sauceId = (req, res) => 
+exports.getSauceById = (req, res) => 
     {
         Sauce.findOne({ _id: req.params.id })
             .then(sauce => res.status(200).json(sauce))
             .catch(error => res.status(404).json({ error }))
     };
 
-exports.saucesPost = (req, res) => 
+exports.createSauce = (req, res) => 
     {
         const sauceObject = JSON.parse(req.body.sauce); //Pour ajouter un fichier à la requête, le front-end doit envoyer
                                                         //les données de la requête sous la forme form-data et non sous forme de JSON. 
@@ -40,18 +41,18 @@ exports.saucesPost = (req, res) =>
                                                         //
 
         sauce.save()                                    //on sauvegarde
-            .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
+            .then(() => res.status(201).json({ message: 'Sauce has been created successfully'}))
             .catch(error => res.status(400).json({ error }));
     };
 
-exports.sauceDelete = (req,res) =>
+exports.deleteSauce = (req,res) =>
     {
         Sauce.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+            .then(() => res.status(200).json({ message: 'Sauce has been deleted successfully'}))
             .catch(error => res.status(400).json({ error }));
     };
 
-exports.saucesLike = (req,res) =>
+exports.LikeSauce = (req,res) =>
     {
         const like = parseInt(req.body.like);   //on récupère un entier du like
         const userId = req.body.userId;         //Id de l'utilisateur
@@ -64,7 +65,7 @@ exports.saucesLike = (req,res) =>
                         { _id: sauceId },
                         { $push: { usersLiked: userId }, $inc: { likes: +1 } }
                     )
-                .then(() => res.status(200).json({ message: "Like" }))
+                .then(() => res.status(200).json({ message: "Sauce has been Like successfully" }))
                 .catch((error) => res.status(400).json({ error }));
             }
         
@@ -75,7 +76,7 @@ exports.saucesLike = (req,res) =>
                         { _id: sauceId },
                         { $push: { usersDisliked: userId }, $inc: { dislikes: +1 } }
                     )
-                .then(() => res.status(200).json({ message: 'Dislike' }))
+                .then(() => res.status(200).json({ message: 'Sauce has been Dislike successfully' }))
                 .catch((error) => res.status(400).json({ error }));
             }
 
@@ -92,7 +93,7 @@ exports.saucesLike = (req,res) =>
                                             { _id: sauceId },
                                             { $pull: { usersLiked: userId }, $inc: { likes: -1 } }  //on supprime userId de la liste des likes et on decrémente les likes
                                         )
-                                    .then(() => res.status(200).json({ message: 'Like retiré !' }))
+                                    .then(() => res.status(200).json({ message: 'Like has been deleted successfully' }))
                                     .catch((error) => res.status(400).json({ error }));
                                 }
             
@@ -104,7 +105,7 @@ exports.saucesLike = (req,res) =>
                                             { _id: sauceId },
                                             { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } } //on supprime l'userId des dislikes et on décrémente la quantité
                                         )
-                                    .then(() => res.status(200).json({ message: 'Dislike retiré !' }))
+                                    .then(() => res.status(200).json({ message: 'Dislike has been deleted successfully' }))
                                     .catch((error) => res.status(400).json({ error }));
                                 }
                         })
@@ -136,7 +137,7 @@ exports.modifySauce = (req, res, next) =>
                         else 
                             {
                                 Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
-                                .then(() => res.status(200).json({message : 'Objet modifié!'}))
+                                .then(() => res.status(200).json({message : 'Sauce has been modified succesfully'}))
                                 .catch(error => res.status(401).json({ error }));
                             }
                     })

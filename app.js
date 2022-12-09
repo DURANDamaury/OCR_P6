@@ -19,8 +19,8 @@ app.use((req, res, next) =>
     next();
     });
 
-const userRoutes = require('./routes/routesUsers');
-const sauceRoutes = require('./routes/routesSauces');    
+const userRoutes = require('./routes/UsersRoutes');
+const sauceRoutes = require('./routes/SaucesRoutes');    
 
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images'))); //indique à Express qu'il faut gérer la ressource images de manière statique
