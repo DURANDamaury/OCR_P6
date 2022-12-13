@@ -14,7 +14,7 @@ exports.getSauceById = (req, res) =>
     {
         Sauce.findOne({ _id: req.params.id })
             .then(sauce => res.status(200).json(sauce))
-            .catch(error => res.status(404).json({ error }))
+            .catch(error => res.status(404).json({ error }))    //404 car la sauce n'existe pas
     };
 
 exports.createSauce = (req, res) => 
@@ -53,26 +53,18 @@ exports.deleteSauce = (req,res) =>
                     {
                         if (sauce.userId != req.auth.userId)    //si la personne qui modifie est différente de la personne qui a créé la sauce
                             {
-                                res.status(401).json({ message : 'Not authorized'});
+                                res.status(403).json({ message : 'Not authorized'});
                             } 
                         else 
                             {
                                 Sauce.deleteOne({ _id: req.params.id })
-                                    .then(() => res.status(200).json({ message: 'Sauce has been deleted successfully'}))
+                                    .then(() => res.status(204).json({ message: 'Sauce has been deleted successfully'})) //On indique "no content" qui sous entend qu'il n'y en a plus
                                     .catch(error => res.status(400).json({ error }));
                             }
                     })
                 .catch((error) => {
                     res.status(400).json({ error });
                 });
-
-
-
-
-
-/*         Sauce.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: 'Sauce has been deleted successfully'}))
-            .catch(error => res.status(400).json({ error })); */
     };
 
 exports.LikeSauce = (req,res) =>
@@ -156,13 +148,13 @@ exports.modifySauce = (req, res, next) =>
                     {
                         if (sauce.userId != req.auth.userId)    //si la personne qui modifie est différente de la personne qui a créé la sauce
                             {
-                                res.status(401).json({ message : 'Not authorized'});
+                                res.status(403).json({ message : 'Not authorized'});
                             } 
                         else 
                             {
                                 Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
                                 .then(() => res.status(200).json({message : 'Sauce has been modified succesfully'}))
-                                .catch(error => res.status(401).json({ error }));
+                                .catch(error => res.status(400).json({ error }));
                             }
                     })
                 .catch((error) => {
