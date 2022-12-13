@@ -2,6 +2,7 @@ const Sauce = require('../models/modelsSauce');
 const Fonctions = require('../utils/sauceFonction')
 
 
+
 exports.getAllSauces = (req, res) => 
     {
         Sauce.find()
@@ -47,9 +48,31 @@ exports.createSauce = (req, res) =>
 
 exports.deleteSauce = (req,res) =>
     {
-        Sauce.deleteOne({ _id: req.params.id })
+        Sauce.findOne({_id: req.params.id})     //on recherche la sauce à modifier
+                .then((sauce) => 
+                    {
+                        if (sauce.userId != req.auth.userId)    //si la personne qui modifie est différente de la personne qui a créé la sauce
+                            {
+                                res.status(401).json({ message : 'Not authorized'});
+                            } 
+                        else 
+                            {
+                                Sauce.deleteOne({ _id: req.params.id })
+                                    .then(() => res.status(200).json({ message: 'Sauce has been deleted successfully'}))
+                                    .catch(error => res.status(400).json({ error }));
+                            }
+                    })
+                .catch((error) => {
+                    res.status(400).json({ error });
+                });
+
+
+
+
+
+/*         Sauce.deleteOne({ _id: req.params.id })
             .then(() => res.status(200).json({ message: 'Sauce has been deleted successfully'}))
-            .catch(error => res.status(400).json({ error }));
+            .catch(error => res.status(400).json({ error })); */
     };
 
 exports.LikeSauce = (req,res) =>
@@ -60,6 +83,7 @@ exports.LikeSauce = (req,res) =>
 
         if (like === 1)     //Si like=1 alors l'utilisateur aime. 
             {
+                //Fonctions.like(req,res)
                 Sauce.updateOne
                     (
                         { _id: sauceId },
