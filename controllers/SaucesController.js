@@ -1,5 +1,6 @@
 const Sauce = require('../models/modelsSauce');
 const likesFonctions = require('../utils/likesFonction')
+const fs = require('fs')
 
 
 
@@ -51,20 +52,26 @@ exports.deleteSauce = (req,res) =>
         Sauce.findOne({_id: req.params.id})     //on recherche la sauce à modifier
                 .then((sauce) => 
                     {
+                        if(!sauce) 
+                            {       
+                            res.status(404).json({error: 'Sauce not exist'});
+                            }
                         if (sauce.userId != req.auth.userId)    //si la personne qui modifie est différente de la personne qui a créé la sauce
                             {
                                 res.status(403).json({ message : 'Not authorized'});
                             } 
                         else 
                             {
+                                const filename = sauce.imageUrl.split("/images/")[1]; // On récupère le nom de l'image
+                                fs.unlink(`images/${filename}`, () => 
+                                {
                                 Sauce.deleteOne({ _id: req.params.id })
                                     .then(() => res.status(204).json({ message: 'Sauce has been deleted successfully'})) //On indique "no content" qui sous entend qu'il n'y en a plus
-                                    .catch(error => res.status(400).json({ error }));
+                                    .catch(error => {res.status(400).json({ error })});
+                                })
                             }
                     })
-                .catch((error) => {
-                    res.status(400).json({ error });
-                });
+                .catch((error) => {res.status(400).json({ error });});
     };
 
 exports.LikeSauce = (req,res) =>

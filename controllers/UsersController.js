@@ -1,20 +1,33 @@
 const User = require('../models/modelsUsers');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const mailValidator = require("email-validator");
+const passwordSchema = require('../utils/PasswordValidationSchema')
+
 
 
 exports.signUp = (req, res, next) => 
     {
-        bcrypt.hash(req.body.password, 10)
-            .then(hash => 
+        if (!mailValidator.validate(req.body.email)) 
             {
-            const user = new User({email: req.body.email, password: hash});
-            user.save()
-                .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-                .catch(error => res.status(400).json({ error: error.message })) //
-            })
-            .catch(error => res.status(500).json({ error: 'erreur en sortie' }));
-
+            res.status(400).json({error: "email is invalid !"})
+            }
+        else if (!passwordSchema.schema().validate(req.body.password)) 
+            {
+            res.status(400).json({error: "Password is invalid !"})
+            }
+        else 
+            {
+            bcrypt.hash(req.body.password, 10)
+                .then(hash => 
+                    {
+                    const user = new User({email: req.body.email, password: hash});
+                    user.save()
+                        .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+                        .catch(error => res.status(400).json({ error: error.message })) //
+                    })
+                .catch(error => res.status(500).json({ error: 'erreur en sortie' }));
+            }
     };
 
 exports.login = (req, res, next) => 
@@ -24,7 +37,7 @@ exports.login = (req, res, next) =>
             {
             if (user === null)  //l'utilisateur n'existe pas
                 {
-                return res.status(401).json({ message: 'Paire login/mot de passe incorrecte'}); // on ne dira pas que l'utilisateur n'existe pas pour ne pas donner cette info
+                return res.status(401).json({ error}); // on ne dira pas que l'utilisateur n'existe pas pour ne pas donner cette info
                 }
             else                //l'utilisateur existe
                 {
@@ -33,7 +46,7 @@ exports.login = (req, res, next) =>
                         {
                         if (!valid) //le mdp n'est pas bon
                             {
-                            return res.status(401).json({ message: 'Paire login/mot de passe incorrecte' });
+                            return res.status(401).json({ error });
                             }
                         else        //le mdp est bon
                             {
